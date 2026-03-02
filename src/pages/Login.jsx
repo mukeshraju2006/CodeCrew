@@ -3,6 +3,7 @@ import { loginUser } from "../api/authApi";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Mail, Lock } from "lucide-react";
+import LoginAnimals from "../components/landing/LoginAnimals";
 
 function Login() {
   const navigate = useNavigate();
@@ -10,19 +11,16 @@ function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setError("");
     setLoading(true);
 
     try {
       await loginUser({ email, password });
-
       login();
       navigate("/dashboard");
     } catch (err) {
@@ -35,12 +33,12 @@ function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white relative overflow-hidden">
 
-      {/* Background Glow */}
+      <LoginAnimals />
+
       <div className="absolute w-96 h-96 bg-indigo-600/30 blur-3xl rounded-full -top-20 -left-20"></div>
       <div className="absolute w-96 h-96 bg-purple-600/30 blur-3xl rounded-full bottom-0 right-0"></div>
 
-      {/* Card */}
-      <div className="relative bg-slate-900 border border-slate-700 w-full max-w-md p-10 rounded-3xl shadow-2xl">
+      <div className="relative bg-slate-900 border border-slate-700 w-full max-w-md p-10 rounded-3xl shadow-2xl z-10 pointer-events-none">
 
         <h2 className="text-3xl font-bold text-center mb-2">
           Welcome!!
@@ -56,9 +54,8 @@ function Login() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 pointer-events-auto">
 
-          {/* Email */}
           <div className="relative">
             <Mail size={18} className="absolute left-3 top-3.5 text-gray-400" />
             <input
@@ -71,7 +68,6 @@ function Login() {
             />
           </div>
 
-          {/* Password */}
           <div className="relative">
             <Lock size={18} className="absolute left-3 top-3.5 text-gray-400" />
             <input
@@ -84,7 +80,6 @@ function Login() {
             />
           </div>
 
-          {/* Button */}
           <button
             type="submit"
             disabled={loading}
@@ -95,12 +90,9 @@ function Login() {
 
         </form>
 
-        <p className="mt-8 text-center text-sm text-gray-400">
+        <p className="mt-8 text-center text-sm text-gray-400 pointer-events-auto">
           Don’t have an account?{" "}
-          <Link
-            to="/register"
-            className="text-indigo-400 hover:text-indigo-300"
-          >
+          <Link to="/register" className="text-indigo-400 hover:text-indigo-300">
             Create one
           </Link>
         </p>

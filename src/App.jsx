@@ -10,6 +10,7 @@ import MyPosts from "./pages/MyPosts";
 import MyRequests from "./pages/MyRequests";
 import PostRequests from "./pages/PostRequests";
 import RequesterProfile from "./pages/RequesterProfile";
+import Landing from "./pages/Landing"
 // Lazy loaded pages
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -21,7 +22,8 @@ function App() {
         <Routes>
 
           {/* Public Routes */}
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/Login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
           {/* Protected Routes */}

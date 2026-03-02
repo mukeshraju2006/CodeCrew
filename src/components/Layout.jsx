@@ -33,7 +33,7 @@ function Layout({ children }) {
       <aside className="w-64 bg-slate-800 border-r border-white/10 p-6 hidden md:flex flex-col">
 
         <h1 className="text-2xl font-bold text-indigo-400 mb-10">
-          NullChapter
+          CodeCrew
         </h1>
 
         <nav className="space-y-2 flex-1">
