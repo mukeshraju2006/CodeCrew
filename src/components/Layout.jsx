@@ -1,7 +1,15 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { logoutUser } from "../api/authApi";
-import { LayoutDashboard, Search, Folder, Send, Plus, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  Search,
+  Folder,
+  Send,
+  Plus,
+  LogOut,
+  Users
+} from "lucide-react";
 
 function Layout({ children }) {
   const { logout } = useAuth();
@@ -19,9 +27,10 @@ function Layout({ children }) {
     }
   };
 
+  // Improved active logic to support nested routes
   const linkStyle = (path) =>
     `flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-      location.pathname === path
+      location.pathname.startsWith(path)
         ? "bg-indigo-600 text-white"
         : "text-gray-300 hover:bg-white/10 hover:text-white"
     }`;
@@ -56,6 +65,12 @@ function Layout({ children }) {
           <Link to="/my-requests" className={linkStyle("/my-requests")}>
             <Send size={18} />
             My Requests
+          </Link>
+
+          {/* NEW TEAMS LINK */}
+          <Link to="/my-teams" className={linkStyle("/my-teams")}>
+            <Users size={18} />
+            My Teams
           </Link>
 
           <Link to="/create" className={linkStyle("/create")}>

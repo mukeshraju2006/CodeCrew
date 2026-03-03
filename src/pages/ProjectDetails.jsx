@@ -4,7 +4,7 @@ import Layout from "../components/Layout";
 import { getSinglePost } from "../api/projectApi";
 import { sendRequest } from "../api/requestApi";
 import { getCurrentUser } from "../api/authApi";
-import { Code2, Users, Layers, ArrowRight } from "lucide-react";
+import { Code2, Users, Layers, ArrowRight, Lock } from "lucide-react";
 
 function ProjectDetails() {
   const { id } = useParams();
@@ -13,6 +13,7 @@ function ProjectDetails() {
   const [contribution, setContribution] = useState("");
   const [message, setMessage] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -39,37 +40,57 @@ function ProjectDetails() {
   }, [id]);
 
   const handleSendRequest = async () => {
+    if (!contribution.trim()) {
+      setMessage("Please describe your contribution.");
+      return;
+    }
+
     try {
+      setSending(true);
       const res = await sendRequest(post._id, contribution);
       setMessage(res.data.message);
       setContribution("");
     } catch (err) {
-      setMessage(
-        err.response?.data?.message || "Request failed"
-      );
+      setMessage(err.response?.data?.message || "Request failed");
+    } finally {
+      setSending(false);
     }
   };
 
-  if (error) return <Layout><p className="text-red-400">{error}</p></Layout>;
-  if (!post) return <Layout><p className="text-gray-400">Loading...</p></Layout>;
+  if (error)
+    return (
+      <Layout>
+        <p className="text-red-400 text-center mt-10">{error}</p>
+      </Layout>
+    );
+
+  if (!post)
+    return (
+      <Layout>
+        <p className="text-gray-400 text-center mt-10">Loading...</p>
+      </Layout>
+    );
 
   const isOwner =
     currentUser && post.createdBy?._id === currentUser._id;
 
+  const isClosed = post.status === "CLOSED";
+
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto space-y-10">
+      <div className="max-w-6xl mx-auto space-y-10">
 
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-10 rounded-3xl shadow-2xl">
           <h2 className="text-4xl font-bold">{post.title}</h2>
           <p className="opacity-90 mt-2">
-            {post.type} • Team Size: {post.teamSize}
+            {post.type} • Team Size: {post.teamSize} • Free Slots:{" "}
+            {post.freeSlot}
           </p>
         </div>
 
         {/* Main Card */}
-        <div className="bg-slate-900 border border-slate-700 rounded-2xl p-10 shadow-xl space-y-8">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-10 shadow-xl space-y-10">
 
           {/* Description */}
           <div>
@@ -100,16 +121,15 @@ function ProjectDetails() {
             </div>
           </div>
 
-          {/* Status + Type */}
-          <div className="flex flex-wrap gap-6 text-gray-300">
+          {/* Status Section */}
+          <div className="flex flex-wrap gap-8 text-gray-300">
+
             <div className="flex items-center gap-2">
               <Layers size={16} />
-              Status:{" "}
+              Status:
               <span
                 className={`font-semibold ${
-                  post.status === "OPEN"
-                    ? "text-green-400"
-                    : "text-red-400"
+                  isClosed ? "text-red-400" : "text-green-400"
                 }`}
               >
                 {post.status}
@@ -118,13 +138,14 @@ function ProjectDetails() {
 
             <div className="flex items-center gap-2">
               <Users size={16} />
-              Team Size: {post.teamSize}
+              Members: {post.teamSize - post.freeSlot} / {post.teamSize}
             </div>
+
           </div>
 
-          {/* Creator Info */}
+          {/* Creator */}
           {post.createdBy && (
-            <div className="border-t border-slate-700 pt-6 text-gray-300">
+            <div className="border-t border-slate-800 pt-6 text-gray-300">
               <p className="text-sm text-gray-400 mb-1">
                 Created By
               </p>
@@ -138,36 +159,65 @@ function ProjectDetails() {
           )}
 
           {/* Action Section */}
-          <div className="border-t border-slate-700 pt-8">
+          <div className="border-t border-slate-800 pt-8 space-y-6">
 
-            {/* Owner View */}
+            {/* OWNER */}
             {isOwner && (
-              <Link
-                to={`/post-requests/${post._id}`}
-                className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 transition px-6 py-3 rounded-lg font-semibold"
-              >
-                View Requests
-                <ArrowRight size={16} />
-              </Link>
+              <div className="flex gap-4 flex-wrap">
+                <Link
+                  to={`/post-requests/${post._id}`}
+                  className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 transition px-6 py-3 rounded-lg font-semibold"
+                >
+                  View Requests
+                  <ArrowRight size={16} />
+                </Link>
+
+                <Link
+                  to={`/team/${post._id}`}
+                  className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 transition px-6 py-3 rounded-lg font-semibold"
+                >
+                  View Team
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
             )}
 
-            {/* Non-owner View */}
+            {/* NON OWNER */}
             {!isOwner && (
               <div className="space-y-4">
 
-                <textarea
-                  value={contribution}
-                  onChange={(e) => setContribution(e.target.value)}
-                  placeholder="How can you contribute to this project?"
-                  className="w-full bg-slate-800 border border-slate-700 focus:border-indigo-500 outline-none p-4 rounded-lg transition text-gray-300"
-                />
+                {isClosed && (
+                  <div className="flex items-center gap-2 text-red-400">
+                    <Lock size={16} />
+                    This project is closed.
+                  </div>
+                )}
 
-                <button
-                  onClick={handleSendRequest}
-                  className="bg-indigo-600 hover:bg-indigo-700 transition px-6 py-3 rounded-lg font-semibold"
+                {!isClosed && (
+                  <>
+                    <textarea
+                      value={contribution}
+                      onChange={(e) => setContribution(e.target.value)}
+                      placeholder="How can you contribute to this project?"
+                      className="w-full bg-slate-800 border border-slate-700 focus:border-indigo-500 outline-none p-4 rounded-lg transition text-gray-300"
+                    />
+
+                    <button
+                      onClick={handleSendRequest}
+                      disabled={sending}
+                      className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition px-6 py-3 rounded-lg font-semibold"
+                    >
+                      {sending ? "Sending..." : "Send Join Request"}
+                    </button>
+                  </>
+                )}
+
+                <Link
+                  to={`/team/${post._id}`}
+                  className="inline-block text-indigo-400 hover:text-indigo-300 text-sm"
                 >
-                  Send Join Request
-                </button>
+                  View Current Team →
+                </Link>
 
                 {message && (
                   <p className="text-sm text-gray-400">

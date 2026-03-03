@@ -7,6 +7,7 @@ import { Search } from "lucide-react";
 function ExploreProjects() {
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -15,34 +16,46 @@ function ExploreProjects() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await getAllPosts();
-        setPosts(res.data.data);
+        setLoading(true);
+
+        const res = await getAllPosts({
+          status: statusFilter || undefined,
+        });
+
+        setPosts(res.data.data || []);
+        setError("");
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch posts");
+        // Backend sends 400 if no posts exist
+        if (err.response?.status === 400) {
+          setPosts([]);
+          setError("");
+        } else {
+          setError(
+            err.response?.data?.message || "Failed to fetch posts"
+          );
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchPosts();
-  }, []);
+  }, [statusFilter]);
 
-  // 🔥 Filter logic
+  // 🔥 Client-side filtering (search + type)
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
       const matchesSearch = post.title
         .toLowerCase()
         .includes(search.toLowerCase());
 
-      const matchesStatus = statusFilter
-        ? post.status === statusFilter
-        : true;
-
       const matchesType = typeFilter
         ? post.type === typeFilter
         : true;
 
-      return matchesSearch && matchesStatus && matchesType;
+      return matchesSearch && matchesType;
     });
-  }, [posts, search, statusFilter, typeFilter]);
+  }, [posts, search, typeFilter]);
 
   return (
     <Layout>
@@ -97,16 +110,23 @@ function ExploreProjects() {
           </div>
         </div>
 
+        {loading && (
+          <div className="text-center text-gray-400 py-12">
+            Loading projects...
+          </div>
+        )}
+
         {error && (
           <p className="text-red-400 text-center">{error}</p>
         )}
 
-        {/* Posts Grid */}
-        {filteredPosts.length === 0 ? (
+        {!loading && filteredPosts.length === 0 && (
           <div className="text-center py-16 text-gray-400">
             No projects match your filters.
           </div>
-        ) : (
+        )}
+
+        {!loading && filteredPosts.length > 0 && (
           <div className="grid md:grid-cols-3 gap-6">
             {filteredPosts.map((post) => (
               <div
@@ -121,6 +141,10 @@ function ExploreProjects() {
                   {post.type}
                 </p>
 
+                <p className="text-sm text-gray-400 mt-2">
+                  Free Slots: {post.freeSlot}
+                </p>
+
                 <span
                   className={`text-xs px-3 py-1 rounded-full ${
                     post.status === "OPEN"
@@ -130,6 +154,12 @@ function ExploreProjects() {
                 >
                   {post.status}
                 </span>
+
+                {post.freeSlot === 0 && (
+                  <div className="mt-3 text-xs text-red-400">
+                    Team Full
+                  </div>
+                )}
 
                 <div className="mt-4">
                   <Link

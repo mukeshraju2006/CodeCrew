@@ -1,19 +1,24 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import ProtectedRoute from "./components/ProtectedRoute";
-import ExploreProjects from "./pages/ExploreProjects";
-import ProjectDetails from "./pages/ProjectDetails";
-import CreateProject from "./pages/CreateProject";
+
+// Immediate pages
+import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import MyPosts from "./pages/MyPosts";
-import MyRequests from "./pages/MyRequests";
-import PostRequests from "./pages/PostRequests";
-import RequesterProfile from "./pages/RequesterProfile";
-import Landing from "./pages/Landing"
-// Lazy loaded pages
+
+// Lazy loaded pages (better performance)
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Profile = lazy(() => import("./pages/Profile"));
+const ExploreProjects = lazy(() => import("./pages/ExploreProjects"));
+const ProjectDetails = lazy(() => import("./pages/ProjectDetails"));
+const CreateProject = lazy(() => import("./pages/CreateProject"));
+const MyPosts = lazy(() => import("./pages/MyPosts"));
+const MyRequests = lazy(() => import("./pages/MyRequests"));
+const PostRequests = lazy(() => import("./pages/PostRequests"));
+const RequesterProfile = lazy(() => import("./pages/RequesterProfile"));
+const MyTeams = lazy(() => import("./pages/MyTeams"));
+const TeamDetails = lazy(() => import("./pages/TeamDetails"));
 
 function App() {
   return (
@@ -23,10 +28,11 @@ function App() {
 
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
-          <Route path="/Login" element={<Login />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
           {/* Protected Routes */}
+
           <Route
             path="/dashboard"
             element={
@@ -71,6 +77,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/myposts"
             element={
@@ -79,6 +86,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/my-requests"
             element={
@@ -96,6 +104,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/requester/:requesterId/:reqId"
             element={
@@ -104,6 +113,27 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* NEW TEAM ROUTES */}
+
+          <Route
+            path="/my-teams"
+            element={
+              <ProtectedRoute>
+                <MyTeams />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/team/:postId"
+            element={
+              <ProtectedRoute>
+                <TeamDetails />
+              </ProtectedRoute>
+            }
+          />
+
         </Routes>
       </Suspense>
     </BrowserRouter>
@@ -112,19 +142,10 @@ function App() {
 
 function LoadingScreen() {
   return (
-    <div style={styles.loader}>
-      <h2>Loading page...</h2>
+    <div className="h-screen flex items-center justify-center bg-slate-950 text-slate-300">
+      <h2 className="text-lg animate-pulse">Loading page...</h2>
     </div>
   );
 }
-
-const styles = {
-  loader: {
-    height: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-};
 
 export default App;

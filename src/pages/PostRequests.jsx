@@ -5,18 +5,26 @@ import {
   getRequestsOnPost,
   changeStatus,
 } from "../api/requestApi";
-import { User, CheckCircle, XCircle, Clock } from "lucide-react";
+import {
+  User,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Users,
+} from "lucide-react";
 
 function PostRequests() {
   const { post_id } = useParams();
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null);
 
   const fetchRequests = async () => {
     try {
       const res = await getRequestsOnPost(post_id);
       setRequests(res.data.data);
+      setError("");
     } catch (err) {
       setError(
         err.response?.data?.message || "Failed to fetch requests"
@@ -31,8 +39,17 @@ function PostRequests() {
   }, []);
 
   const handleStatusChange = async (reqId, status) => {
-    await changeStatus(reqId, status);
-    fetchRequests();
+    try {
+      setActionLoading(reqId);
+      await changeStatus(reqId, status);
+      await fetchRequests();
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Failed to update status"
+      );
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const statusStyle = (status) => {
@@ -42,19 +59,19 @@ function PostRequests() {
       return "bg-green-500/20 text-green-400 border-green-500/30";
     if (status === "REJECTED")
       return "bg-red-500/20 text-red-400 border-red-500/30";
+    return "";
   };
 
   return (
     <Layout>
       <div className="max-w-6xl mx-auto space-y-10">
 
-        {/* Header */}
         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-10 rounded-3xl shadow-2xl">
           <h2 className="text-4xl font-bold">
             Manage Applications
           </h2>
           <p className="opacity-90 mt-2">
-            Review and approve collaboration requests.
+            Review collaboration requests.
           </p>
         </div>
 
@@ -72,7 +89,8 @@ function PostRequests() {
 
         {!loading && requests.length === 0 && (
           <div className="bg-slate-900 border border-slate-700 text-gray-300 p-10 rounded-2xl text-center shadow-xl">
-            No requests yet for this post.
+            <Users size={40} className="mx-auto mb-4 text-gray-500" />
+            No requests yet.
           </div>
         )}
 
@@ -80,16 +98,24 @@ function PostRequests() {
           {requests.map((r) => (
             <div
               key={r._id}
-              className="bg-slate-900 border border-slate-700 hover:border-indigo-500 transition duration-300 p-8 rounded-2xl shadow-xl hover:-translate-y-2"
+              className="bg-slate-900 border border-slate-700 p-8 rounded-2xl shadow-xl"
             >
-              {/* Requester Name */}
+              {/* Requester Link */}
               <Link
                 to={`/requester/${r.requesterId._id}/${r._id}`}
-                className="flex items-center gap-3 text-indigo-400 hover:text-indigo-300 font-semibold text-lg"
+                state={{ status: r.status }}
+                className="flex items-center gap-3 text-indigo-400 font-semibold text-lg"
               >
                 <User size={20} />
                 {r.requesterId?.fullName}
               </Link>
+
+              {/* Contribution */}
+              {r.howCanYouContribute && (
+                <p className="mt-4 text-gray-400 text-sm">
+                  {r.howCanYouContribute}
+                </p>
+              )}
 
               {/* Status */}
               <div className="mt-4">
@@ -109,19 +135,21 @@ function PostRequests() {
               {r.status === "PENDING" && (
                 <div className="flex gap-4 mt-6">
                   <button
+                    disabled={actionLoading === r._id}
                     onClick={() =>
                       handleStatusChange(r._id, "ACCEPTED")
                     }
-                    className="flex-1 bg-green-600 hover:bg-green-700 transition py-2 rounded-lg font-semibold"
+                    className="flex-1 bg-green-600 hover:bg-green-700 py-2 rounded-lg font-semibold disabled:opacity-50"
                   >
                     Accept
                   </button>
 
                   <button
+                    disabled={actionLoading === r._id}
                     onClick={() =>
                       handleStatusChange(r._id, "REJECTED")
                     }
-                    className="flex-1 bg-red-600 hover:bg-red-700 transition py-2 rounded-lg font-semibold"
+                    className="flex-1 bg-red-600 hover:bg-red-700 py-2 rounded-lg font-semibold disabled:opacity-50"
                   >
                     Reject
                   </button>
