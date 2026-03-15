@@ -1,20 +1,19 @@
 import client from "./client";
 
-export const registerUser = (data) => {
-  return client.post("/users/register", data);
-};
+// Sends multipart/form-data — backend uses multer upload.single("pic")
+export const registerUser = (formData) =>
+  client.post("/users/register", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 
-export const loginUser = (data) => {
-  return client.post("/users/login", data);
-};
+export const loginUser = (data) =>
+  client.post("/users/login", data);
 
-export const logoutUser = () => {
-  return client.post("/users/logout");
-};
+export const logoutUser = () =>
+  client.post("/users/logout");
 
-export const getCurrentUser = () => {
-  return client.get("/users/me");
-};
+export const getCurrentUser = () =>
+  client.get("/users/me");
 
 export const viewRequester = (requesterId) =>
   client.get(`/users/getInfo/${requesterId}`);

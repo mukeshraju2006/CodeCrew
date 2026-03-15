@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Layout from "../components/Layout";
 import client from "../api/client";
-import { Crown, Shield, Tag, Layers, Users } from "lucide-react";
+import { Crown, Shield, Tag, Layers, Users, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 function MemberCard({ member, isLeader, i }) {
@@ -132,9 +132,18 @@ function TeamDetails() {
         {!loading && members.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
             className="flex items-center gap-3">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold"
-              style={{ background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)", color: "#a78bfa" }}>
-              <Users size={14} /> {members.length} member{members.length !== 1 ? "s" : ""}
+            <div className="flex items-center gap-3">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold"
+                style={{ background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)", color: "#a78bfa" }}>
+                <Users size={14} /> {members.length} member{members.length !== 1 ? "s" : ""}
+              </div>
+              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+                <Link to={`/team/${postId}/chat`}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+                  style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.2), rgba(236,72,153,0.2))", border: "1px solid rgba(124,58,237,0.4)", color: "#fff" }}>
+                  <MessageSquare size={14} /> Team Chat
+                </Link>
+              </motion.div>
             </div>
           </motion.div>
         )}

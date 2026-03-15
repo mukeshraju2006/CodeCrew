@@ -132,7 +132,11 @@ function Login() {
     setError("");
     setLoading(true);
     try {
-      await loginUser({ email, password });
+      const res = await loginUser({ email, password });
+      // accessToken stored for Socket.IO auth (cookie is httpOnly so JS cant read it)
+      if (res.data?.accessToken) {
+        localStorage.setItem("accessToken", res.data.accessToken);
+      }
       login();
       navigate("/dashboard");
     } catch (err) {
