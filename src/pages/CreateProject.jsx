@@ -350,7 +350,7 @@ function CreateProject() {
             <Field label="Project Title" icon={<FileText size={13} />}>
               <TextInput
                 name="title"
-                placeholder="AI Powered Resume Analyzer"
+                placeholder="Name your project"
                 value={form.title}
                 onChange={handleChange}
               />
