@@ -1,13 +1,19 @@
 import { io } from "socket.io-client";
 
 let socket = null;
+let connectedToken = null;
 
 export function connectSocket() {
-  if (socket?.connected) return socket;
-
-  // Token stored in localStorage after login (since cookie is httpOnly)
   const token = localStorage.getItem("accessToken");
-  console.log("TOKEN FROM STORAGE:", token);
+
+  // If socket exists but token changed (different user logged in), disconnect first
+  if (socket && connectedToken !== token) {
+    socket.disconnect();
+    socket = null;
+    connectedToken = null;
+  }
+
+  if (socket?.connected) return socket;
 
   const BASE =
     import.meta.env.VITE_API_BASE_URL
@@ -19,6 +25,8 @@ export function connectSocket() {
     withCredentials: true,
     transports: ["websocket", "polling"],
   });
+
+  connectedToken = token;
 
   socket.on("connect",       () => console.log("Socket connected:", socket.id));
   socket.on("connect_error", (e) => console.error("Socket error:", e.message));
@@ -34,5 +42,6 @@ export function disconnectSocket() {
   if (socket) {
     socket.disconnect();
     socket = null;
+    connectedToken = null;
   }
 }

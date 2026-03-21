@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { registerUser } from "../api/authApi";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, User, FileText, Zap, Github, Linkedin, Layers, Tag, Eye, EyeOff, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { Mail, Lock, User, FileText, Zap, Github, Linkedin, Layers, Tag, Eye, EyeOff, ArrowRight, CheckCircle2, AlertCircle, ImagePlus } from "lucide-react";
 import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 
 // ─── Particle Canvas ──────────────────────────────────────────────────────────
@@ -129,24 +129,46 @@ function FSelect({ label, icon, value, onChange, options }) {
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 function Register() {
-  const navigate = useNavigate();
-  const [form, setForm] = useState({ fullName: "", email: "", password: "", bio: "", experienceLevel: "", skills: "", techStack: "", gitHub: "", linkdn: "" });
-  const [showPw, setShowPw]   = useState(false);
-  const [error, setError]     = useState("");
-  const [success, setSuccess] = useState("");
-  const [loading, setLoading] = useState(false);
+  const navigate  = useNavigate();
+  const fileRef   = useRef(null);
+
+  const [form, setForm] = useState({
+    fullName: "", email: "", password: "", bio: "",
+    experienceLevel: "", skills: "", techStack: "", gitHub: "", linkdn: ""
+  });
+  const [pic, setPic]           = useState(null);
+  const [picPreview, setPicPreview] = useState(null);
+  const [showPw, setShowPw]     = useState(false);
+  const [error, setError]       = useState("");
+  const [success, setSuccess]   = useState("");
+  const [loading, setLoading]   = useState(false);
 
   const set = field => e => setForm(f => ({ ...f, [field]: e.target.value }));
 
+  const handlePic = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPic(file);
+    setPicPreview(URL.createObjectURL(file));
+  };
+
   const handleSubmit = async e => {
-    e.preventDefault(); setError(""); setSuccess(""); setLoading(true);
+    e.preventDefault();
+    setError(""); setSuccess("");
+    if (!pic) { setError("Please upload a profile picture."); return; }
+    setLoading(true);
     try {
-      await registerUser({ ...form,
-        skills: form.skills.split(",").map(s => s.trim()).filter(Boolean),
-        techStack: form.techStack.split(",").map(t => t.trim()).filter(Boolean),
-      });
+      const fd = new FormData();
+      // Append all text fields
+      Object.entries(form).forEach(([k, v]) => fd.append(k, v));
+      // Overwrite skills + techStack as comma-joined strings (backend splits them)
+      fd.set("skills",    form.skills.split(",").map(s => s.trim()).filter(Boolean).join(","));
+      fd.set("techStack", form.techStack.split(",").map(t => t.trim()).filter(Boolean).join(","));
+      // Append file — field name must match multer: upload.single("pic")
+      fd.append("pic", pic);
+      await registerUser(fd);
       setSuccess("Account created! Redirecting…");
-      setTimeout(() => navigate("/"), 1500);
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
     } finally { setLoading(false); }
@@ -161,8 +183,10 @@ function Register() {
 
       {/* Orbs */}
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-        <div className="absolute w-[500px] h-[500px] rounded-full -left-40 -top-40" style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.09) 0%, transparent 70%)" }} />
-        <div className="absolute w-[400px] h-[400px] rounded-full -right-32 -bottom-32" style={{ background: "radial-gradient(ellipse, rgba(236,72,153,0.07) 0%, transparent 70%)" }} />
+        <div className="absolute w-[500px] h-[500px] rounded-full -left-40 -top-40"
+          style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.09) 0%, transparent 70%)" }} />
+        <div className="absolute w-[400px] h-[400px] rounded-full -right-32 -bottom-32"
+          style={{ background: "radial-gradient(ellipse, rgba(236,72,153,0.07) 0%, transparent 70%)" }} />
       </div>
 
       <div className="relative z-10 w-full max-w-2xl">
@@ -170,7 +194,7 @@ function Register() {
         {/* Logo */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
           className="flex justify-center mb-8">
-          <Link to="/" className="flex items-center gap-2 group">
+          <Link to="/login" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-900/40">
               <Zap size={16} fill="white" />
             </div>
@@ -181,7 +205,9 @@ function Register() {
         {/* Heading */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6 }}
           className="text-center mb-8">
-          <h1 className="text-4xl font-extrabold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Create your account.</h1>
+          <h1 className="text-4xl font-extrabold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            Create your account.
+          </h1>
           <p className="text-white/30 text-sm">Join the crew. Start building.</p>
         </motion.div>
 
@@ -210,31 +236,77 @@ function Register() {
 
           <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-5">
 
-            <FInput label="Full Name"  icon={<User size={12} />}    placeholder="Jane Smith"             value={form.fullName}       onChange={set("fullName")}       span2 />
-            <FInput label="Email"      icon={<Mail size={12} />}    placeholder="you@example.com"        value={form.email}          onChange={set("email")}         type="email" autoComplete="email" span2 />
-            <FInput label="Password"   icon={<Lock size={12} />}    placeholder="Create a password"      value={form.password}       onChange={set("password")}      type={showPw ? "text" : "password"} autoComplete="new-password" span2
-              rightEl={<button type="button" onClick={() => setShowPw(v => !v)} className="text-white/20 hover:text-white/50 transition-colors">{showPw ? <EyeOff size={15} /> : <Eye size={15} />}</button>} />
+            <FInput label="Full Name"  icon={<User size={12} />}      placeholder="Jane Smith"                  value={form.fullName}  onChange={set("fullName")}  span2 />
+            <FInput label="Email"      icon={<Mail size={12} />}      placeholder="you@example.com"             value={form.email}     onChange={set("email")}     type="email" autoComplete="email" span2 />
+            <FInput label="Password"   icon={<Lock size={12} />}      placeholder="Create a password"           value={form.password}  onChange={set("password")}  type={showPw ? "text" : "password"} autoComplete="new-password" span2
+              rightEl={
+                <button type="button" onClick={() => setShowPw(v => !v)} className="text-white/20 hover:text-white/50 transition-colors">
+                  {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              } />
 
-            <FTextarea label="Short Bio" icon={<FileText size={12} />} placeholder="Tell the crew about yourself…" value={form.bio} onChange={set("bio")} />
+            {/* ── Profile Picture Upload ── */}
+            <div className="md:col-span-2">
+              <div className="flex items-center justify-between mb-2">
+                <label className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-white/25">
+                  <span className="text-white/20"><ImagePlus size={12} /></span>
+                  Profile Picture
+                  <span className="text-red-400 normal-case font-normal tracking-normal">*</span>
+                </label>
+                {picPreview && (
+                  <button type="button" onClick={() => { setPic(null); setPicPreview(null); fileRef.current.value = ""; }}
+                    className="text-xs text-white/25 hover:text-red-400 transition-colors">Remove</button>
+                )}
+              </div>
+              <input ref={fileRef} type="file" accept="image/*" onChange={handlePic} className="hidden" />
+              <motion.button type="button" whileTap={{ scale: 0.98 }} onClick={() => fileRef.current.click()}
+                className="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-left transition-all"
+                style={{
+                  background: "rgba(255,255,255,0.03)",
+                  border: picPreview ? "1px solid rgba(124,58,237,0.5)" : "1px dashed rgba(255,255,255,0.12)"
+                }}>
+                {picPreview ? (
+                  <img src={picPreview} alt="preview"
+                    className="w-11 h-11 rounded-xl object-cover shrink-0"
+                    style={{ border: "1px solid rgba(124,58,237,0.4)" }} />
+                ) : (
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+                    style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.2)" }}>
+                    <ImagePlus size={18} className="text-violet-400" />
+                  </div>
+                )}
+                <div>
+                  <p className="text-sm font-medium" style={{ color: picPreview ? "#fff" : "rgba(255,255,255,0.3)" }}>
+                    {picPreview ? pic?.name : "Click to upload a photo"}
+                  </p>
+                  <p className="text-xs text-white/20 mt-0.5">PNG, JPG, WEBP · Max 5MB</p>
+                </div>
+              </motion.button>
+            </div>
 
-            <FSelect label="Experience Level" icon={<Zap size={12} />} value={form.experienceLevel} onChange={set("experienceLevel")}
+            <FTextarea label="Short Bio"        icon={<FileText size={12} />}  placeholder="Tell the crew about yourself…"   value={form.bio}          onChange={set("bio")} />
+            <FSelect   label="Experience Level" icon={<Zap size={12} />}       value={form.experienceLevel}                  onChange={set("experienceLevel")}
               options={[{ v: "", l: "Select experience level" }, { v: "Beginner", l: "Beginner" }, { v: "Intermediate", l: "Intermediate" }, { v: "Advanced", l: "Advanced" }]} />
 
-            <FInput label="Skills"     icon={<Tag size={12} />}    placeholder="React, Python, ML…"      value={form.skills}         onChange={set("skills")}    hint="Comma separated" />
-            <FInput label="Tech Stack" icon={<Layers size={12} />} placeholder="MERN, Django, AWS…"      value={form.techStack}      onChange={set("techStack")} hint="Comma separated" />
-            <FInput label="GitHub"     icon={<Github size={12} />} placeholder="https://github.com/…"    value={form.gitHub}         onChange={set("gitHub")} />
-            <FInput label="LinkedIn"   icon={<Linkedin size={12} />} placeholder="https://linkedin.com/in/…" value={form.linkdn}    onChange={set("linkdn")} />
+            <FInput label="Skills"     icon={<Tag size={12} />}       placeholder="React, Python, ML…"           value={form.skills}    onChange={set("skills")}    hint="Comma separated" />
+            <FInput label="Tech Stack" icon={<Layers size={12} />}    placeholder="MERN, Django, AWS…"           value={form.techStack} onChange={set("techStack")} hint="Comma separated" />
+            <FInput label="GitHub"     icon={<Github size={12} />}    placeholder="https://github.com/username"  value={form.gitHub}    onChange={set("gitHub")} />
+            <FInput label="LinkedIn"   icon={<Linkedin size={12} />}  placeholder="https://linkedin.com/in/…"    value={form.linkdn}    onChange={set("linkdn")} />
 
             {/* Submit */}
             <div className="md:col-span-2 pt-2">
               <MagneticBtn type="submit" disabled={loading}
-                className="group w-full flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-bold py-4 rounded-xl shadow-xl shadow-violet-900/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                {loading ? (
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-bold py-4 rounded-xl shadow-xl shadow-violet-900/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                {loading && (
                   <motion.span animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
                     className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
-                ) : null}
+                )}
                 <span>{loading ? "Creating Account…" : "Create Account"}</span>
-                {!loading && <motion.span animate={{ x: [0, 3, 0] }} transition={{ duration: 1.5, repeat: Infinity }}><ArrowRight size={16} /></motion.span>}
+                {!loading && (
+                  <motion.span animate={{ x: [0, 3, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+                    <ArrowRight size={16} />
+                  </motion.span>
+                )}
               </MagneticBtn>
             </div>
 
