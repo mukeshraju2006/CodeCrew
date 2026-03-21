@@ -3,10 +3,12 @@ import { io } from "socket.io-client";
 let socket = null;
 let connectedToken = null;
 
+const BACKEND_URL = "https://nullchapter-backend.onrender.com";
+
 export function connectSocket() {
   const token = localStorage.getItem("accessToken");
 
-  // If socket exists but token changed (different user logged in), disconnect first
+  // If token changed (new user logged in), disconnect old socket first
   if (socket && connectedToken !== token) {
     socket.disconnect();
     socket = null;
@@ -15,12 +17,7 @@ export function connectSocket() {
 
   if (socket?.connected) return socket;
 
-  const BASE =
-    import.meta.env.VITE_API_BASE_URL
-      ?.replace("/api/v1", "")
-      .replace("/api", "") || "http://localhost:5000";
-
-  socket = io(BASE, {
+  socket = io(BACKEND_URL, {
     auth: { token },
     withCredentials: true,
     transports: ["websocket", "polling"],
@@ -28,7 +25,7 @@ export function connectSocket() {
 
   connectedToken = token;
 
-  socket.on("connect",       () => console.log("Socket connected:", socket.id));
+  socket.on("connect", () => console.log("Socket connected:", socket.id));
   socket.on("connect_error", (e) => console.error("Socket error:", e.message));
 
   return socket;
