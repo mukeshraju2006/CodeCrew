@@ -104,7 +104,7 @@
 
 ### Clone the repo
 ```bash
-git clone https://github.com/yourusername/CodeCrew.git
+git clone https://github.com/mukeshraju2006/CodeCrew.git
 cd CodeCrew
 ```
 
@@ -114,11 +114,7 @@ cd my-react-app
 npm install
 ```
 
-Create `.env` in frontend root:
-```env
-VITE_API_BASE_URL=https://nullchapter-backend.onrender.com/api/v1
-```
-
+Create `.env` in frontend root — refer to `.env.example`:
 ```bash
 npm run dev
 ```
@@ -129,23 +125,19 @@ cd NullChapter_Backend
 npm install
 ```
 
-Create `.env` in backend root:
-```env
-DB_CONNECTION_STRNG=your_mongodb_uri
-PORT=5000
-CORS_ORIGIN=http://localhost:5173
-ACCESSTOKENSECRET=your_secret
-REFRESHTOKENSECRET=your_secret
-ACCESSTOKENEXPIRY=1d
-REFRESHTOKENEXPIRY=7d
-CLOUDINARY_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-```
-
+Create `.env` in backend root — refer to `.env.example`:
 ```bash
 npm run dev
 ```
+
+---
+
+## 📁 Environment Variables
+
+Both frontend and backend require environment variables to run.
+Check the `.env.example` files in each folder for the required keys.
+
+> ⚠️ Never commit your `.env` files — they are gitignored.
 
 ---
 
@@ -198,12 +190,6 @@ npm run dev
     </td>
   </tr>
 </table>
-
----
-
-## 📄 License
-
-MIT License — feel free to use this project as inspiration.
 
 ---
 
