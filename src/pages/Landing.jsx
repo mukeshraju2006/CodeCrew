@@ -575,8 +575,8 @@ export default function Landing() {
             © {new Date().getFullYear()} CodeCrew. Built for developers, by developers.
           </p>
           <div className="flex gap-6 text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
-            {["Privacy", "Terms", "GitHub"].map(item => (
-              <a key={item} href="#" className="hover:text-white transition-colors">{item}</a>
+            {["GitHub"].map(item => (
+              <a key={item} href="https://github.com/mukeshraju2006/my-react-app" className="hover:text-white transition-colors">{item}</a>
             ))}
           </div>
         </div>
