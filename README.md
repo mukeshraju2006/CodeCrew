@@ -195,7 +195,7 @@ Check the `.env.example` files in each folder for the required keys.
 
 <div align="center">
 
-**Built with 🔥 by Mukesh & Divyansh**
+**Built by Mukesh & Divyansh**
 
 *If you liked this project, give it a ⭐ on GitHub!*
 
