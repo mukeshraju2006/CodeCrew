@@ -1,8 +1,8 @@
 <div align="center">
 
-```
+# 🚀 CodeCrew
 
-### 🚀 The Developer Collaboration Platform
+### The Developer Collaboration Platform
 
 *Find your team. Ship your ideas. Build the future.*
 
@@ -17,7 +17,7 @@
 
 ## ✨ What is CodeCrew?
 
-**CodeCrew** is a full-stack developer collaboration platform where developers can post projects, find skilled teammates, send join requests, manage teams, and chat in real time — all in one place.
+**CodeCrew** is a full-stack developer collaboration platform where developers can post projects, find skilled teammates, send join requests, manage teams, and chat in real time, all in one place.
 
 > *No LinkedIn spam. No cold DMs. Just developers who want to ship real things.*
 
@@ -41,24 +41,26 @@
 ## 🛠️ Tech Stack
 
 ### Frontend
-```
-⚡ React 18          — UI library
+
+```text
+⚡ React 18          — UI Library
 🎨 Tailwind CSS      — Styling
 🎭 Framer Motion     — Animations
 🔄 React Router v6   — Navigation
-📡 Axios             — API calls
-🔌 Socket.IO Client  — Real-time chat
+📡 Axios             — API Calls
+🔌 Socket.IO Client  — Real-time Chat
 ☁️ Deployed on Vercel
 ```
 
 ### Backend
-```
+
+```text
 🟢 Node.js + Express  — Server & REST API
 🍃 MongoDB + Mongoose — Database
 🔑 JWT                — Authentication
-🔒 Bcrypt             — Password hashing
-📁 Multer             — File uploads
-☁️ Cloudinary         — Image storage
+🔒 Bcrypt             — Password Hashing
+📁 Multer             — File Uploads
+☁️ Cloudinary         — Image Storage
 ⚡ Socket.IO          — Real-time WebSockets
 ☁️ Deployed on Render
 ```
@@ -67,7 +69,7 @@
 
 ## 🏗️ Architecture
 
-```
+```text
 ┌─────────────────────┐         ┌──────────────────────┐
 │                     │  HTTPS  │                      │
 │   React Frontend    │◄───────►│   Express Backend    │
@@ -91,34 +93,40 @@
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js v18+
 - MongoDB
-- Cloudinary account
+- Cloudinary Account
 
-### Clone the repo
+### Clone the Repository
+
 ```bash
 git clone https://github.com/mukeshraju2006/CodeCrew.git
 cd CodeCrew
 ```
 
 ### Setup Frontend
+
 ```bash
 cd my-react-app
 npm install
 ```
 
-Create `.env` in frontend root — refer to `.env.example`:
+Create a `.env` file in the frontend root (refer to `.env.example`), then run:
+
 ```bash
 npm run dev
 ```
 
 ### Setup Backend
+
 ```bash
 cd NullChapter_Backend
 npm install
 ```
 
-Create `.env` in backend root — refer to `.env.example`:
+Create a `.env` file in the backend root (refer to `.env.example`), then run:
+
 ```bash
 npm run dev
 ```
@@ -128,15 +136,16 @@ npm run dev
 ## 📁 Environment Variables
 
 Both frontend and backend require environment variables to run.
+
 Check the `.env.example` files in each folder for the required keys.
 
-> ⚠️ Never commit your `.env` files — they are gitignored.
+> ⚠️ Never commit your `.env` files. They are already included in `.gitignore`.
 
 ---
 
 ## 📸 Pages
 
-```
+```text
 / .............. Landing Page
 /register ...... Register
 /login ......... Login
@@ -156,12 +165,12 @@ Check the `.env.example` files in each folder for the required keys.
 
 ## 🌊 How It Works
 
-```
-1. Register with profile pic → saved to Cloudinary
+```text
+1. Register with profile picture → Saved to Cloudinary
 2. Post a project or explore existing ones
 3. Send a join request with your contribution pitch
 4. Project owner reviews your profile & accepts/rejects
-5. Get added to the team → access team chat
+5. Get added to the team → Access team chat
 6. Build together in real time 🚀
 ```
 
@@ -170,25 +179,26 @@ Check the `.env.example` files in each folder for the required keys.
 ## 👨‍💻 Team
 
 <table>
-  <tr>
-    <td align="center">
-      <b>Mukesh Raju</b><br/>
-      <sub>Frontend Developer</sub><br/>
-      <a href="https://github.com/mukeshraju2006">@mukeshraju2006</a>
-    </td>
-    <td align="center">
-      <b>Divyansh Giri</b><br/>
-      <sub>Backend Developer</sub><br/>
-      <a href="https://github.com/divyanshgiri-sudo">@divyanshgiri-sudo</a>
-    </td>
-  </tr>
+<tr>
+<td align="center">
+<b>Mukesh Raju</b><br>
+<sub>Frontend Developer</sub><br>
+<a href="https://github.com/mukeshraju2006">@mukeshraju2006</a>
+</td>
+
+<td align="center">
+<b>Divyansh Giri</b><br>
+<sub>Backend Developer</sub><br>
+<a href="https://github.com/divyanshgiri-sudo">@divyanshgiri-sudo</a>
+</td>
+</tr>
 </table>
 
 ---
 
 <div align="center">
 
-**Built ---- - by Mukesh & Divyansh**
+### Built with ❤️ by Mukesh & Divyansh
 
 *If you liked this project, give it a ⭐ on GitHub!*
 
